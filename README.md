@@ -23,6 +23,10 @@ Durante o desenvolvimento, foram praticados conceitos como:
 - Estruturação de aplicações backend
 - Modelagem de domínio
 - Versionamento com Git e GitHub
+- Autenticação e autorização com Spring Security
+- Tokens JWT (JSON Web Token)
+- Hash de senhas com BCrypt
+- Controle de acesso baseado em roles (RBAC)
 
 Além disso, o projeto busca reforçar conceitos iniciais de **DDD**, utilizando uma organização mais próxima do domínio da aplicação, separando entidades, responsabilidades e fluxos da API.
 
@@ -35,6 +39,9 @@ Além disso, o projeto busca reforçar conceitos iniciais de **DDD**, utilizando
 - Spring Web
 - Spring Data JPA
 - Hibernate
+- Spring Security
+- JWT (java-jwt / Auth0)
+- BCrypt
 - MySQL
 - Flyway
 - Maven
@@ -57,6 +64,10 @@ Além disso, o projeto busca reforçar conceitos iniciais de **DDD**, utilizando
 ✅ Migrations com Flyway  
 ✅ Organização baseada em domínio  
 ✅ API RESTful  
+✅ Autenticação via login com geração de token JWT  
+✅ Registro de usuários com senha criptografada (BCrypt)  
+✅ Autorização baseada em roles (`USER` / `ADMIN`)  
+✅ Proteção de rotas com Spring Security  
 
 ---
 
@@ -72,25 +83,71 @@ A aplicação foi estruturada utilizando:
 - Enum para categorização de gêneros
 - Paginação com Spring Data
 - Organização baseada em domínio
+- Filtro de autenticação JWT (`OncePerRequestFilter`)
+- Configuração de segurança stateless (`SecurityFilterChain`)
 
 A estrutura atual busca aplicar conceitos iniciais de **Domain Driven Design (DDD)**, organizando os pacotes de acordo com o contexto da aplicação:
 
 ```text
-author/
-book/
-publisher/
+domain/
+├── author/
+├── book/
+├── user/
+└── publisher/
+auth/
 controller/
+infra/
+└── security/
 ```
 
 ---
 
 # 🌐 Endpoints
 
+## 🔐 Autenticação
+
+### Login
+
+```http
+POST /auth/login
+```
+
+Rota pública. Recebe usuário e senha e retorna um token JWT, que deve ser enviado no header `Authorization: Bearer <token>` nas demais requisições.
+
+```json
+{
+  "username": "admin",
+  "password": "admin123"
+}
+```
+
+### Registrar usuário
+
+```http
+POST /auth/register
+```
+
+Restrito a usuários com role `ADMIN`. Cria um novo usuário com senha criptografada em BCrypt.
+
+```json
+{
+  "username": "leitor1",
+  "password": "senha123",
+  "role": "USER"
+}
+```
+
+> Um usuário `admin` inicial (`admin` / `admin123`) é criado automaticamente via migration Flyway, para permitir o primeiro acesso e o cadastro dos demais usuários. **Troque essa senha em qualquer ambiente compartilhado.**
+
+---
+
 ## 📖 Registrar Livro
 
 ```http
 POST /books
 ```
+
+🔒 Requer autenticação com role `ADMIN`.
 
 ---
 
@@ -100,6 +157,8 @@ POST /books
 GET /books
 ```
 
+🔒 Requer autenticação (`USER` ou `ADMIN`).
+
 ---
 
 ## ✏️ Atualizar Livro
@@ -108,6 +167,8 @@ GET /books
 PUT /books
 ```
 
+🔒 Requer autenticação com role `ADMIN`.
+
 ---
 
 ## ❌ Deletar Livro
@@ -115,6 +176,8 @@ PUT /books
 ```http
 DELETE /books/{id}
 ```
+
+🔒 Requer autenticação com role `ADMIN`.
 
 ---
 
@@ -132,6 +195,8 @@ O projeto utiliza:
 - **DTOs** para entrada e saída de dados da API
 - **Enums** para definição dos gêneros dos livros
 - **Embedded Objects** para representar objetos de domínio como `Author` e `Publisher`
+- **Tabela `users`** para autenticação, com senha armazenada em hash BCrypt
+- **Seed de usuário admin** via migration para bootstrap inicial do sistema de autenticação
 
 ---
 
@@ -152,6 +217,9 @@ Durante o desenvolvimento deste projeto foram reforçados conceitos como:
 - Estruturação backend
 - Git/GitHub
 - Conceitos iniciais de DDD
+- Autenticação stateless com JWT
+- Autorização baseada em roles com Spring Security
+- Criptografia de senhas com BCrypt
 
 ---
 
@@ -162,7 +230,8 @@ Algumas melhorias futuras planejadas:
 - Swagger/OpenAPI
 - Tratamento global de exceções
 - Relacionamentos entre entidades
-- Sistema de autenticação
+- Endpoint de troca de senha
+- Refresh token
 - Docker
 - Deploy da aplicação
 - Integração com frontend
