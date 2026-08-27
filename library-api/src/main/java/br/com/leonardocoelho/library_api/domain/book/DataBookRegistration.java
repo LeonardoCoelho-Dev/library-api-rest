@@ -1,7 +1,7 @@
-package br.com.leonardocoelho.library_api.book;
+package br.com.leonardocoelho.library_api.domain.book;
 
-import br.com.leonardocoelho.library_api.author.DataAuthor;
-import br.com.leonardocoelho.library_api.publisher.DataPublisher;
+import br.com.leonardocoelho.library_api.domain.author.DataAuthor;
+import br.com.leonardocoelho.library_api.domain.DataPublisher;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 

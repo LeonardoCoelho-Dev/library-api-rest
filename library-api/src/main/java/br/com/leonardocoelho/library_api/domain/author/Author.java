@@ -1,4 +1,4 @@
-package br.com.leonardocoelho.library_api.publisher;
+package br.com.leonardocoelho.library_api.domain.author;
 
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
@@ -11,27 +11,32 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Embeddable
-public class Publisher {
+public class Author {
 
     private String name;
+    private Integer age;
+    private Integer birthYear;
     private String country;
-    private Integer foundationYear;
 
-    public Publisher(DataPublisher data) {
+    public Author(DataAuthor data) {
         this.name = data.name();
+        this.age = data.age();
+        this.birthYear = data.birthYear();
         this.country = data.country();
-        this.foundationYear = data.foundationYear();
     }
 
-    public void updateInformation(DataPublisher data) {
+    public void updateInformation(DataAuthor data) {
         if (data.name() != null){
             this.name = data.name();
         }
+        if (data.age() != null){
+            this.age = data.age();
+        }
+        if (data.birthYear() != null){
+            this.birthYear = data.birthYear();
+        }
         if (data.country() != null){
             this.country = data.country();
-        }
-        if (data.foundationYear() != null){
-            this.foundationYear = data.foundationYear();
         }
     }
 }
