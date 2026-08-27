@@ -1,6 +1,6 @@
 package br.com.leonardocoelho.library_api.controller;
 
-import br.com.leonardocoelho.library_api.book.*;
+import br.com.leonardocoelho.library_api.domain.book.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

@@ -1,4 +1,4 @@
-package br.com.leonardocoelho.library_api.author;
+package br.com.leonardocoelho.library_api.domain.author;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;

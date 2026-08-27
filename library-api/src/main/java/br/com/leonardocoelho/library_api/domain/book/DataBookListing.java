@@ -1,10 +1,4 @@
-package br.com.leonardocoelho.library_api.book;
-
-import br.com.leonardocoelho.library_api.author.DataAuthor;
-import br.com.leonardocoelho.library_api.publisher.DataPublisher;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+package br.com.leonardocoelho.library_api.domain.book;
 
 public record DataBookListing(
 
