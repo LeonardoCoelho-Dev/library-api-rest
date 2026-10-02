@@ -1,4 +1,4 @@
-package br.com.leonardocoelho.library_api.auth;
+package br.com.leonardocoelho.library_api.interfaces.auth;
 
 import jakarta.validation.constraints.NotBlank;
 

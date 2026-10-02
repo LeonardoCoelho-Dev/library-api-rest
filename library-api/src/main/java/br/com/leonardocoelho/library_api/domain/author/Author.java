@@ -1,15 +1,18 @@
 package br.com.leonardocoelho.library_api.domain.author;
 
+import br.com.leonardocoelho.library_api.domain.shared.Guard;
 import jakarta.persistence.Embeddable;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
+/**
+ * Value Object: immutable and compared by value. To "change" an author, build a new one.
+ */
 @Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@EqualsAndHashCode
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Embeddable
 public class Author {
 
@@ -18,25 +21,22 @@ public class Author {
     private Integer birthYear;
     private String country;
 
-    public Author(DataAuthor data) {
-        this.name = data.name();
-        this.age = data.age();
-        this.birthYear = data.birthYear();
-        this.country = data.country();
+    public Author(String name, Integer age, Integer birthYear, String country) {
+        this.name = Guard.notBlank(name, "author name");
+        this.age = Guard.inRange(age, 1, 200, "author age");
+        this.birthYear = Guard.inRange(birthYear, 1000, 9999, "author birth year");
+        this.country = Guard.notBlank(country, "author country");
     }
 
-    public void updateInformation(DataAuthor data) {
-        if (data.name() != null){
-            this.name = data.name();
-        }
-        if (data.age() != null){
-            this.age = data.age();
-        }
-        if (data.birthYear() != null){
-            this.birthYear = data.birthYear();
-        }
-        if (data.country() != null){
-            this.country = data.country();
-        }
+    /**
+     * Returns a new Author where every non-null argument replaces the current value.
+     */
+    public Author withChanges(String name, Integer age, Integer birthYear, String country) {
+        return new Author(
+                name != null ? name : this.name,
+                age != null ? age : this.age,
+                birthYear != null ? birthYear : this.birthYear,
+                country != null ? country : this.country
+        );
     }
 }

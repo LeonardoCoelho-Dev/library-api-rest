@@ -1,5 +1,6 @@
-package br.com.leonardocoelho.library_api.domain.author;
+package br.com.leonardocoelho.library_api.interfaces.book;
 
+import br.com.leonardocoelho.library_api.application.book.AuthorCommand;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -23,4 +24,8 @@ public record DataAuthor(
         @NotBlank
         String country
 ) {
+
+    public AuthorCommand toCommand() {
+        return new AuthorCommand(name, age, birthYear, country);
+    }
 }

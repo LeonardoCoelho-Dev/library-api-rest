@@ -86,19 +86,34 @@ A aplicação foi estruturada utilizando:
 - Filtro de autenticação JWT (`OncePerRequestFilter`)
 - Configuração de segurança stateless (`SecurityFilterChain`)
 
-A estrutura atual busca aplicar conceitos iniciais de **Domain Driven Design (DDD)**, organizando os pacotes de acordo com o contexto da aplicação:
+A estrutura aplica **Domain Driven Design (DDD)** em quatro camadas, com a regra de dependência apontando sempre para o domínio:
 
 ```text
-domain/
-├── author/
-├── book/
-├── user/
-└── publisher/
-auth/
-controller/
-infra/
-└── security/
+domain/                  # regras de negócio, sem Spring Web / Validation / Security
+├── book/                # agregado Book, Genre, BookRepository (port), BookNotFoundException
+├── author/              # Value Object Author (imutável)
+├── publisher/           # Value Object Publisher (imutável)
+├── user/                # agregado User, UserRole, UserRepository (port)
+└── shared/              # DomainException, Guard (invariantes)
+application/             # casos de uso, commands e fronteira transacional
+├── book/                # BookService, RegisterBookCommand, UpdateBookCommand
+└── user/                # UserService, RegisterUserCommand
+interfaces/              # porta de entrada HTTP
+├── book/                # BookController e DTOs (Bean Validation)
+├── auth/                # AuthenticationController e DTOs
+└── exception/           # ApiExceptionHandler (DomainException -> HTTP)
+infra/                   # detalhes técnicos
+├── persistence/         # adapters JPA que implementam os ports do domínio
+└── security/            # Spring Security, JWT, AuthenticatedUser (adapter de UserDetails)
 ```
+
+**Principais decisões:**
+
+- **Value Objects imutáveis** (`Author`, `Publisher`): sem setters, comparados por valor; "alterar" gera uma nova instância (`withChanges`).
+- **Agregados protegem seus invariantes**: `Book` e `User` validam o próprio estado (via `Guard`) e não expõem setters públicos.
+- **Repositórios como ports**: o domínio declara a interface; o Spring Data JPA fica em `infra/persistence`.
+- **Camada de aplicação**: controllers só traduzem HTTP; os casos de uso e o `@Transactional` ficam nos services.
+- **Domínio sem framework web**: DTOs com Bean Validation vivem em `interfaces`; o domínio não conhece Spring Security (`User` ≠ `UserDetails`).
 
 ---
 
@@ -228,7 +243,7 @@ Durante o desenvolvimento deste projeto foram reforçados conceitos como:
 Algumas melhorias futuras planejadas:
 
 - Swagger/OpenAPI
-- Tratamento global de exceções
+- Tratamento global de exceções para validação (Bean Validation) e autenticação no mesmo formato `ProblemDetail`
 - Relacionamentos entre entidades
 - Endpoint de troca de senha
 - Refresh token
