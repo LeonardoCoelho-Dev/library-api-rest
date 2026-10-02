@@ -1,4 +1,7 @@
-package br.com.leonardocoelho.library_api.domain.book;
+package br.com.leonardocoelho.library_api.interfaces.book;
+
+import br.com.leonardocoelho.library_api.domain.book.Book;
+import br.com.leonardocoelho.library_api.domain.book.Genre;
 
 public record DataBookListing(
 
@@ -15,7 +18,7 @@ public record DataBookListing(
         Integer publishedYear
 ) {
 
-    public DataBookListing(Book book){
+    public DataBookListing(Book book) {
         this(
                 book.getId(),
                 book.getTitle(),

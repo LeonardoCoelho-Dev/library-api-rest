@@ -1,5 +1,6 @@
-package br.com.leonardocoelho.library_api.domain;
+package br.com.leonardocoelho.library_api.interfaces.book;
 
+import br.com.leonardocoelho.library_api.application.book.PublisherCommand;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -18,4 +19,8 @@ public record DataPublisher(
         @Max(9999)
         Integer foundationYear
 ) {
+
+    public PublisherCommand toCommand() {
+        return new PublisherCommand(name, country, foundationYear);
+    }
 }

@@ -1,17 +1,22 @@
 package br.com.leonardocoelho.library_api.domain.book;
 
-
 import br.com.leonardocoelho.library_api.domain.author.Author;
-import br.com.leonardocoelho.library_api.domain.Publisher;
+import br.com.leonardocoelho.library_api.domain.publisher.Publisher;
+import br.com.leonardocoelho.library_api.domain.shared.Guard;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+/**
+ * Aggregate root. Every state change goes through methods that protect its invariants;
+ * there are no public setters.
+ */
 @Entity(name = "Book")
 @Table(name = "books")
 @Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id")
 public class Book {
 
@@ -41,39 +46,44 @@ public class Book {
     @Enumerated(EnumType.STRING)
     private Genre genre;
 
-    public Book(DataBookRegistration data){
-
-        this.title = data.title();
-        this.description = data.description();
-        this.publishedYear = data.publishedYear();
-        this.volume = data.volume();
-        this.genre = data.genre();
-        this.author = new Author(data.author());
-        this.publisher = new Publisher(data.publisher());
+    public Book(String title, Author author, String description, Publisher publisher,
+                Integer publishedYear, String volume, Genre genre) {
+        this.title = Guard.notBlank(title, "title");
+        this.author = Guard.notNull(author, "author");
+        this.description = Guard.notBlank(description, "description");
+        this.publisher = Guard.notNull(publisher, "publisher");
+        this.publishedYear = Guard.inRange(publishedYear, 1000, 9999, "published year");
+        this.volume = Guard.notBlank(volume, "volume");
+        this.genre = Guard.notNull(genre, "genre");
     }
 
-    public void updateInformation (DataBookUpdate data){
-        if (data.title() != null){
-            this.title = data.title();
+    /**
+     * Partial update: null arguments mean "keep the current value".
+     */
+    public void updateInformation(String title, String description, Integer publishedYear,
+                                  String volume, Genre genre) {
+        if (title != null) {
+            this.title = Guard.notBlank(title, "title");
         }
-        if (data.description() != null){
-            this.description = data.description();
+        if (description != null) {
+            this.description = Guard.notBlank(description, "description");
         }
-        if (data.publishedYear() != null){
-            this.publishedYear = data.publishedYear();
+        if (publishedYear != null) {
+            this.publishedYear = Guard.inRange(publishedYear, 1000, 9999, "published year");
         }
-        if (data.genre() != null){
-            this.genre = data.genre();
+        if (volume != null) {
+            this.volume = Guard.notBlank(volume, "volume");
         }
-        if (data.author() != null){
-            this.author.updateInformation(data.author());
-        }
-        if (data.publisher() != null){
-            this.publisher.updateInformation(data.publisher());
-        }
-        if (data.volume() != null){
-            this.volume = data.volume();
+        if (genre != null) {
+            this.genre = genre;
         }
     }
 
+    public void updateAuthor(String name, Integer age, Integer birthYear, String country) {
+        this.author = this.author.withChanges(name, age, birthYear, country);
+    }
+
+    public void updatePublisher(String name, String country, Integer foundationYear) {
+        this.publisher = this.publisher.withChanges(name, country, foundationYear);
+    }
 }

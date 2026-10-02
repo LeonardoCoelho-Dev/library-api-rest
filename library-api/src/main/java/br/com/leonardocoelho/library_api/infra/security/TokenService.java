@@ -1,6 +1,5 @@
 package br.com.leonardocoelho.library_api.infra.security;
 
-import br.com.leonardocoelho.library_api.domain.user.User;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
@@ -20,12 +19,12 @@ public class TokenService {
 
     private static final String ISSUER = "library-api";
 
-    public String generateToken(User user) {
+    public String generateToken(String username) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             return JWT.create()
                     .withIssuer(ISSUER)
-                    .withSubject(user.getUsername())
+                    .withSubject(username)
                     .withExpiresAt(genExpirationDate())
                     .sign(algorithm);
         } catch (JWTCreationException exception) {
